@@ -78,24 +78,24 @@ class Captcha {
   // Control -------------------------------------------------------------------
 
   /// Returns true if tries counter is greater or equals to its limit.
-  function isUpLimit (): Bool {
+  public function isUpLimit (): Bool {
     return counter >= counterLimit;
   }
 
   /// Checks cells.
-  function check (): Bool {
+  public function check (): Bool {
     return It.from(ch0).every(ch -> !ch.getChecked()) &&
       It.from(ch1).every(ch -> ch.getChecked());
   }
 
   /// Increments counter.
-  function increment (): Void {
+  public function increment (): Void {
     setCounter(storeId, counter + 1);
     setTime(storeId, Date.now().getTime());
   }
 
   /// Resets counter.
-  function reset () {
+  public function reset () {
     resetCounter(storeId);
     resetTime(storeId);
   }
@@ -103,8 +103,10 @@ class Captcha {
   // Static --------------------------------------------------------------------
 
   static function getCounter (id: String): Int {
-    final r = Store.get(id + "_counter");
-    return r == null ? 0 : Std.parseInt(r);
+    return switch (Store.get(id + "_counter")) {
+      case Some(v): Std.parseInt(v);
+      case None: 0;
+    }
   }
 
   static function setCounter (id: String, n: Int): Void {
@@ -116,8 +118,10 @@ class Captcha {
   }
 
   static function getTime (id: String): Float {
-    final r = Store.get(id + "_time");
-    return r == null ? Date.now().getTime() : Std.parseFloat(r);
+    return switch (Store.get(id + "_time")) {
+      case Some(v): Std.parseFloat(v);
+      case None: Date.now().getTime();
+    }
   }
 
   static function setTime (id: String, n: Float): Void {

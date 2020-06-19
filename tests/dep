@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd Captcha
+./dep
+cd ../Clock
+./dep
+cd ../DatePicker
+./dep
+cd ../Menu
+./dep
+cd ../ModalBox
+./dep
+
+echo "Finished."
