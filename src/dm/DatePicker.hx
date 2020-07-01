@@ -304,7 +304,7 @@ class DatePicker {
         isShow = true;
         return;
       }
-      span.e.removeChild(span.e.lastChild);
+      span.removeAll();
       isShow = false;
     };
     button.e.onclick = btAction;
@@ -312,7 +312,7 @@ class DatePicker {
     final previousAction = action;
     action = s -> {
       previousAction(s);
-      span.e.removeChild(span.e.lastChild);
+      span.removeAll();
       isShow = false;
     };
 
@@ -342,7 +342,7 @@ class DatePicker {
         isShow = true;
         return;
       }
-      span.e.removeChild(span.e.lastChild);
+      span.removeAll();
       isShow = false;
     };
     textInput.value(format(Dt.to(date)));
@@ -353,7 +353,7 @@ class DatePicker {
     action = s -> {
       textInput.value(s == "" ? "" : format(s));
       previousAction(s);
-      span.e.removeChild(span.e.lastChild);
+      span.removeAll();
       isShow = false;
     };
 
