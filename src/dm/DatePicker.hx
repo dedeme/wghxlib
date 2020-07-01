@@ -28,7 +28,7 @@ class DatePicker {
   ///   - If 'none' is clicked an empty string is sent to 'action'.
   ///   - If a day is clicked a date in format 'YYYYMMDD' is sent to 'action'.
   /// It must be set before calling to 'mk' functions.
-  public var action = s -> Ui.alert("'$s' was clicked");
+  public var action = s -> Ui.alert('"$s" was clicked');
 
   // First day of current month.
   var dateView: Date;

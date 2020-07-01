@@ -141,7 +141,7 @@ class Menu {
   ///        If it has not extension, '.png' will be used.
   ///   module : Module or null (Default 'null').
   public static function ilink (
-    id: String, img: String, module: Null<String> = null
+    id: String, img: String, ?module: String
   ): MenuEntry {
     return new MenuEntry(
       Some(id),
