@@ -86,12 +86,12 @@ class Menu {
 
   /// Option type text.
   ///   id: Identifier.
-  ///   tx: Text to show.
+  ///   tx: Html text to show.
   ///   f : Function on click.
   public static function toption (
     id: String, tx: String, f: Void -> Void
   ): MenuEntry {
-    return new MenuEntry(Some(id), Ui.link(_ -> f()).text(tx));
+    return new MenuEntry(Some(id), Ui.link(_ -> f()).html(tx));
   }
 
   /// Option type text.
@@ -117,7 +117,7 @@ class Menu {
   ///   '"?" + id'
   /// if module is null.
   ///   id: Identifier.
-  ///   tx: Text to show.
+  ///   tx: Html text to show.
   ///   module : Module or null (Default 'null').
   public static function tlink (
     id: String, tx: String, module: Null<String> = null
@@ -126,7 +126,7 @@ class Menu {
       Some(id),
       Q("a")
         .att("href", "?" + (module == null ? "" : module + "&") + id)
-        .text(tx)
+        .html(tx)
     );
   }
 
