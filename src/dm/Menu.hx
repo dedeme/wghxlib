@@ -3,7 +3,7 @@
 
 package dm;
 
-import haxe.ds.Option;
+import dm.Opt;
 import dm.Domo;
 import dm.Ui.Q;
 import dm.Ui;
