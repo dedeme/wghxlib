@@ -9,15 +9,15 @@ import dm.Ui.Q;
 import dm.Ui;
 
 /// Vertical menu.
-class VMenu {
-  var opts: Array<VMenuEntry>;
+class Vmenu {
+  var opts: Array<VmenuEntry>;
   /// Menu widget.
   public var wg(default, null): Domo;
   /// Constructor
   ///   opts: Menu options.
   ///   selected: Identifier of selected menu option or "".
-  public function new (opts: Array<VMenuEntry>, selected: String) {
-    function setId (o: VMenuEntry) {
+  public function new (opts: Array<VmenuEntry>, selected: String) {
+    function setId (o: VmenuEntry) {
       switch (o.id) {
         case Some(id):
           if (id == selected) {
@@ -27,7 +27,7 @@ class VMenu {
         case None:
       }
     }
-    for (o in opts) setId(o));
+    for (o in opts) setId(o);
 
     this.opts = opts;
     wg = Q("div");
@@ -50,14 +50,14 @@ class VMenu {
   // Static --------------------------------------------------------------------
 
   /// Returns a separator.
-  public static function separator (): VMenuEntry {
-    return new VMenuEntry(None, Q("hr"));
+  public static function separator (): VmenuEntry {
+    return new VmenuEntry(None, Q("hr"));
   }
 
   /// Returns a title.
   ///   tx: Text of title in html.
-  public static function title (tx: String): VMenuEntry {
-    return new VMenuEntry(None, Q("span").html("<b>" + tx + "</b>"));
+  public static function title (tx: String): VmenuEntry {
+    return new VmenuEntry(None, Q("span").html("<b>" + tx + "</b>"));
   }
 
   /// Returns a menu option
@@ -66,22 +66,22 @@ class VMenu {
   ///   f : Function to run when the option is clicked.
   public  static function option (
     id: String, tx: String, f: () -> Void
-  ) VMenuEntry {
-    return new VMenuEntry(Some(id), Ui.link(e -> f()).klass("link").text(tx));
+  ): VmenuEntry {
+    return new VmenuEntry(Some(id), Ui.link(e -> f()).klass("link").text(tx));
   }
 }
 
 /// Vertical menu entry.
-class VMenuEntry {
+class VmenuEntry {
   /// Identifier.
-  public var id(default, null): Opt<String>;
+  public var id(default, null): Option<String>;
   /// Entry widget.
   public var wg(default, null): Domo;
 
   /// Constructor.
   ///   id: Entry identifier.
   ///   wg: Entry widget.
-  public function new(id: Opt<String>, wg: Domo) {
+  public function new(id: Option<String>, wg: Domo) {
     this.id = id;
     this.wg = wg;
   }
