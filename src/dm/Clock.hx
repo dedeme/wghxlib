@@ -25,14 +25,13 @@ class Clock {
   /// Numbers color. Default "#000033".
   public var shand: String = "#000033";
   /// Clock widget
-  public var wg(default, null): Domo = Q("div");
+  public var wg(get, never): Domo;
+  function get_wg () return mk();
 
-  public function new () {
-    view();
-  }
+  public function new () {}
 
   /// Returns clock widget.
-  function view (): Void {
+  function mk (): Domo {
     final cv = Q("canvas")
       .att("width", this.width)
       .att("height", this.height)
@@ -48,7 +47,7 @@ class Clock {
     final tm = new haxe.Timer(1000);
     tm.run = () -> this.paint(ctx, radius);
 
-    wg.add(cv);
+    return cv;
   }
 
   function paint (ctx: js.html.CanvasRenderingContext2D, radius: Float): Void {

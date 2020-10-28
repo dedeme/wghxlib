@@ -6,6 +6,8 @@ import dm.Ui.Q;
 class Clock {
   static public function main (): Void {
     final clock = new dm.Clock();
+    clock.width *= 2;
+    clock.height *= 2;
     Q("@body")
       .add(Q("table").att("align", "center")
         .add(Q("tr")
