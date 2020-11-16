@@ -3,11 +3,12 @@
 
 package dm;
 
+/// Class to connect with an Internet server.
 class Client {
   var isDmCgi: Bool;
   var appName: String;
   var fExpired: Void -> Void;
-  var key = B64.encode("0");
+  var key = "0";
   var connectionKey = "";
 
   /// Connected user.
@@ -60,10 +61,10 @@ class Client {
     isSecure: Bool, data: Map<String, Js>, fn: Map<String, Js> -> Void
   ): Void {
     final fn2 = rp -> {
+      var data: Map<String, Js>;
       try {
         final jdata = Cryp.decryp(key, rp);
-        final data = Js.from(jdata).ro();
-        fn(data);
+        data = Js.from(jdata).ro();
       } catch (e) {
         try {
           final jdata = Cryp.decryp("nosession", rp);
@@ -74,9 +75,10 @@ class Client {
           }
           throw(e);
         } catch (e2) {
-          trace('RAW SERVER RESPONSE:\n${rp}\nCLIENT ERROR:\n${e}');
+          throw('RAW SERVER RESPONSE:\n${rp}\nCLIENT ERROR:\n${e}');
         }
       }
+      fn(data);
     }
 
     final rq = isSecure
@@ -103,7 +105,7 @@ class Client {
       try {
         final jdata = Cryp.decryp(sessionId(), rp);
         final data = Js.from(jdata).ro();
-        final key = data.get("key").rs();
+        key = data.get("key").rs();
         if (key == "") {
           fn(false);
           return;
@@ -139,8 +141,8 @@ class Client {
           return;
         }
         setSessionId(sessionId);
+        this.user = user;
         key = data.get("key").rs();
-        user = data.get("user").rs();
         level = data.get("level").rs();
         connectionKey = data.get("conKey").rs();
         fn(true);
@@ -149,7 +151,7 @@ class Client {
       }
     }
 
-    final key = Cryp.key(appName, klen);
+    key = Cryp.key(appName, klen);
     final p = Client.crypPass(pass);
     final exp = withExpiration ? "1" : "0";
     sendServer(":" + Cryp.cryp(key, '${user}:${p}:${exp}'), fn2);
@@ -208,8 +210,8 @@ class Client {
 
   static final klen = 300;
 
-  // Processing of user password before sending it to server.
-  static function crypPass (pass: String): String {
+  /// Processing of user password before sending it to server.
+  public static function crypPass (pass: String): String {
     return Cryp.key(pass, klen);
   }
 }

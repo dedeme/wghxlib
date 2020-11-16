@@ -28,6 +28,18 @@ class Rnd {
     return Dec.round(n1 + Math.random() * (n2 - n1), d);
   };
 
+  /// Rearranges elements of 'a' randomly.
+  public static function shuffle<T> (a: Array<T>) {
+    var j: Int;
+    var tmp: T;
+    var i = a.length;
+    while (i > 1) {
+      j = Math.floor(Math.random() * i--);
+      tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+  }
 
   /// Returns a Box with repeated elements
   ///   es : Description of box elements. For example:

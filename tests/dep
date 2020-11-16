@@ -6,9 +6,13 @@ cd ../Clock
 ./dep
 cd ../DatePicker
 ./dep
+cd ../ListSorter
+./dep
 cd ../Menu
 ./dep
 cd ../ModalBox
+./dep
+cd ../Spinner
 ./dep
 
 echo "Finished."

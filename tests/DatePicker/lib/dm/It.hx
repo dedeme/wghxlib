@@ -3,7 +3,7 @@
 
 package dm;
 
-import haxe.ds.Option;
+import dm.Opt;
 import haxe.ds.StringMap;
 
 /// Lazy iterator.
@@ -72,7 +72,7 @@ class It<T> {
   }
 
   /// Returns an iterator over numbers from begin (inclusive) to end
-  /// (exclusive).<p>
+  /// (exclusive).
   /// If 'end' is not indicated then the range is from 0 to 'begin'.
   public static function range (begin: Int, ?end: Int): It<Int> {
     if (end == null) {
@@ -86,34 +86,22 @@ class It<T> {
     );
   }
 
-  /// Returns an infinite random iterator over elements of 'a'.
-  public static function box<T> (a: Array<T>) {
-    var c = 0;
-    final len = a.length;
+  /// Returns an infinite random iterator over elements of 'arr'.
+  public static function box<T> (arr: Array<T>) {
+    final len = arr.length;
     if (len == 0)
       return It.empty();
 
-    function shuffle () {
-      var ix = len;
-      while (ix > 1) {
-        final i = Std.random(ix);
-        --ix;
-        if (i != ix) {
-          var tmp = a[i];
-          a[i] = a[ix];
-          a[ix] = tmp;
-        }
-      }
-    }
-    shuffle ();
-
+    final a = arr.copy();
+    Rnd.shuffle(a);
+    var c = 0;
     return new It(
       () -> true,
       () ->
         if (c < len)
           a[c++];
         else {
-          shuffle();
+          Rnd.shuffle(a);
           c = 0;
           a[c++];
         }
@@ -121,7 +109,7 @@ class It<T> {
   }
 
   /// Returns an infinite random iterator over elements of an array whose
-  /// elements are 'm' keys repeated 'it value' times.<p>
+  /// elements are 'm' keys repeated 'it value' times.
   /// For example:
   ///   It.mbox(["a" => 2, "b" => 1])
   /// iterates over ["a", "a", "b"]
@@ -134,7 +122,7 @@ class It<T> {
     return box(a);
   }
 
-  /// Returns a new It over sequencial tuples of values from 'it1' and 'it2'.<p>
+  /// Returns a new It over sequencial tuples of values from 'it1' and 'it2'.
   /// The size of return is the less of 'it1' and 'it2'.
   public static function zip<T, U> (it1: It<T>, it2: It<U>): It<Tp<T, U>> {
     return new It(
@@ -144,7 +132,7 @@ class It<T> {
   }
 
   /// Returns a new It over sequencial tuples of values from 'it1', 'it2'
-  /// and it3.<p>
+  /// and it3.
   /// The size of return is the less of 'it1', 'it2' and 'it3'.
   public static function zip3<T, U, Z> (
     it1: It<T>, it2: It<U>, it3: It<Z>
@@ -162,7 +150,7 @@ class It<T> {
     return it.map(e -> e, e -> sep + e).reduce("", (seed, e) -> seed + e);
   }
 
-  /// Returns an It spliting 's' with 'sep'.<p>
+  /// Returns an It spliting 's' with 'sep'.
   /// It is the inverse function of 'join'.
   public static function split (s: String, sep: String): It<String> {
     final len = s.length;
@@ -187,7 +175,7 @@ class It<T> {
 
   // Eager ---------------------------------------------------------------------
 
-  /// Returns 'true' if 'this' contains 'e' using 'feq'.<p>
+  /// Returns 'true' if 'this' contains 'e' using 'feq'.
   /// If 'feq' is not defined, '==' is used.
   public function contains (e: T, ?feq: (T, T) -> Bool): Bool {
     if (feq == null) {
@@ -226,6 +214,7 @@ class It<T> {
   /// Runs 'fn' using the callback 'loop' for each element of 'this'. After
   /// that runs 'go'. If some fail happends running 'fn' execute
   /// 'fail(exception)' (if defined). For example:
+  ///
   ///   static function cb (n: Int, fn: (Int->Void)) {
   ///     fn(n + 1);
   ///   }
@@ -268,7 +257,7 @@ class It<T> {
     frec();
   }
 
-  /// Returns 'true' if 'it' is equals to 'this' using the funcion 'feq'.<p>
+  /// Returns 'true' if 'it' is equals to 'this' using the funcion 'feq'.
   /// If 'feq' is null or not is set, function '==' is used.
   public function eq (it: It<T>, ?feq: (T, T) -> Bool): Bool {
     if (feq == null) {
@@ -315,7 +304,7 @@ class It<T> {
   }
 
   /// Returns the first index of 'e' in 'this', or -1 if 'this' does not
-  /// contains 'e',  using 'feq'.<p>
+  /// contains 'e',  using 'feq'.
   /// If 'feq' is not defined, '==' is used.
   public function index (e: T, ?feq: (T, T) -> Bool): Int {
     var c = 0;
@@ -350,7 +339,7 @@ class It<T> {
   }
 
   /// Returns the last index of 'e' in 'this', or -1 if 'this' does not
-  /// contains 'e',  using 'feq'.<p>
+  /// contains 'e',  using 'feq'.
   /// If 'feq' is not defined, '==' is used.
   public function lastIndex (e: T, ?feq: (T, T) -> Bool): Int {
     var r = -1;
@@ -380,7 +369,7 @@ class It<T> {
 
   /// Returns the value resulting to apply 'fn' over 'seed' and the first
   /// element of 'this', and after that to apply 'fn' to the previous result
-  /// in turn.<p>
+  /// in turn.
   /// 'reduce (x, It.empty())' returns 'x'.
   public function reduce<U> (seed: U, fn: (U, T) -> U): U {
     while (hasNext())
@@ -524,7 +513,7 @@ class It<T> {
   }
 
   /// Returns a new It applying 'fn' to the first element and 'fn2' to the
-  /// rest.<p>
+  /// rest.
   /// If 'fn2' is not defined, 'fn' is applied to every element.
   public function map<U> (fn: T -> U, ?fn2: T -> U): It<U> {
     if (fn2 == null) {
@@ -611,7 +600,7 @@ class It<T> {
 
   // With intermediate Array ---------------------------------------------------
 
-  /// Returns elements of 'this' in reverse order.<p>
+  /// Returns elements of 'this' in reverse order.
   /// It creates a temporary array.
   public function reverse (): It<T> {
     var tmp = to();
@@ -619,7 +608,7 @@ class It<T> {
     return It.from(tmp);
   }
 
-  /// Returns elements of 'this' sorted by 'fn'.<p>
+  /// Returns elements of 'this' sorted by 'fn'.
   /// It creates a temporary array.
   public function sort (fn: (T, T) -> Int): It<T> {
     var tmp = to();
@@ -627,11 +616,12 @@ class It<T> {
     return It.from(tmp);
   }
 
-  /// Returns elements of 'this' in random order.<p>
+  /// Returns elements of 'this' in random order.
   /// It creates a temporary array.
   public function shuffle (): It<T> {
     final a = to();
-    return It.box(a).take(a.length);
+    Rnd.shuffle(a);
+    return It.from(a);
   }
 
   /// Returns a tuple of It over the corresponding first and second element

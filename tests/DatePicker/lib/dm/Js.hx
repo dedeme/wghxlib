@@ -38,6 +38,10 @@ class Js {
     return Json.stringify(this.js);
   }
 
+  public static function wn (): Js {
+    return new Js(null);
+  }
+
   public static function wb (b: Bool): Js {
     return new Js(b);
   }
@@ -87,6 +91,10 @@ class Js {
     for (k => v in m)
       r.set(k, fto(v));
     return wo(r);
+  }
+
+  public function isNull (): Bool {
+    return js == null;
   }
 
   public function rb (): Bool {
@@ -159,9 +167,9 @@ class Js {
       Read a Map whose values can be deserialized with 'ffrom'.<p>
       If it fails, returns None.
   **/
-  public static function rMap<T> (js:Js, ffrom: Js -> T): Map<String, T> {
+  public function rMap<T> (ffrom: Js -> T): Map<String, T> {
     final r = new Map<String, T>();
-    for (k => v in js.ro())
+    for (k => v in ro())
       r.set(k, ffrom(v));
     return r;
   }
