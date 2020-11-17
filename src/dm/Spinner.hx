@@ -18,10 +18,15 @@ class Spinner {
 
   var sz: String;
   var width: String;
-
-  public var max(default, null): Int;
+  var tm = Date.now();
+  /// Minimum value (Between -100 and 99, both inclusive)
   public var min(default, null): Int;
+  /// Maximum value (Between -99 and 100, both inclusive)
+  public var max(default, null): Int;
+  /// Current spinner value.
   public var value(default, null): Int;
+  /// Function to run when 'value' change.
+  public var onChange: Int -> Void = v -> {};
 
   /// Constructor.
   ///
@@ -102,7 +107,7 @@ class Spinner {
     } else {
       lessWg
         .removeAll()
-        .add(Ui.link(e -> lessFn())
+        .add(Ui.link(lessFn)
           .html("&#x25C0;"))
       ;
     }
@@ -118,7 +123,7 @@ class Spinner {
     } else {
       moreWg
         .removeAll()
-        .add(Ui.link(e -> moreFn())
+        .add(Ui.link(moreFn)
           .html("&#x25B6;"))
       ;
     }
@@ -126,13 +131,15 @@ class Spinner {
 
   // Control -------------------------------------------------------------------
 
-  function lessFn (): Void {
+  function lessFn (e: js.html.MouseEvent): Void {
     --value;
+    onChange(value);
     update();
   }
 
-  function moreFn (): Void {
+  function moreFn (e: js.html.MouseEvent): Void {
     ++value;
+    onChange(value);
     update();
   }
 
@@ -144,6 +151,17 @@ class Spinner {
     if (value < min) value = min;
     if (value == old) return;
     update();
+
+    tm = Date.now();
+    haxe.Timer.delay(
+      () -> {
+        if (Dt.dfMillis(Date.now(), tm) > 150) {
+          tm = Date.now();
+          onChange(value);
+        }
+      },
+      200
+    );
   }
 
 }

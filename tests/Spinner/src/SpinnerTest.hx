@@ -6,12 +6,14 @@ import dm.Spinner;
 
 class SpinnerTest {
   static public function main (): Void {
+    final large = new Spinner(-100, 100, -100, LARGE);
+    large.onChange = v -> trace(v);
     Q("@body")
       .add(new Spinner(-100, 100, -100, TINY).wg)
       .add(new Spinner(-100, 100, -100, SMALL).wg)
       .add(new Spinner(-100, 100, -100, NORMAL).wg)
       .add(new Spinner(-100, 100, -100, BIG).wg)
-      .add(new Spinner(-100, 100, -100, LARGE).wg)
+      .add(large.wg)
     ;
   }
 }
