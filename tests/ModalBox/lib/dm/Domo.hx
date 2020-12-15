@@ -5,9 +5,11 @@
 
 package dm;
 
+import haxe.Constraints;
+
 /// Constants to use with '.on()'
 enum ActionType {
-  BLUR; CHANGE; CLICK; DBLCLICK; FOCUS; KEYDOWN; KEYPRESS; KEYUP;
+  BLUR; CHANGE; CLICK; DBLCLICK; FOCUS; INPUT; KEYDOWN; KEYPRESS; KEYUP;
   LOAD; MOUSEDOWN; MOUSEMOVE; MOUSEOUT; MOUSEOVER; MOUSEUP; WHEEL;
   SELECT; SELECTSTART; SUBMIT;
 }
@@ -142,15 +144,14 @@ class Domo {
   }
 
   /// Adds an EventListener.
-  /// To replace it use obj.e.onXXX = Event. For example:
-  ///   td.e.onclick = e -> Ui.alert("Here");
-  public function on (type: ActionType, action: Dynamic -> Void): Domo {
+  public function on (type: ActionType, action: Function): Domo {
     var act = switch type {
       case BLUR: "blur";
       case CHANGE: "change";
       case CLICK: "click";
       case DBLCLICK: "dblclick";
       case FOCUS: "focus";
+      case INPUT: "input";
       case KEYDOWN: "keydown";
       case KEYPRESS: "keypress";
       case KEYUP: "keyup";

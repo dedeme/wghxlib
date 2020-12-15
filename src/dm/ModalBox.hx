@@ -31,14 +31,14 @@ class ModalBox {
         .add(Q("td")
           .style("width:100%;text-align:right;padding-bottom:5px")
           .add(Q("span")
-            .text("[ "))
+            .text("["))
           .add(Ui.link(_ -> show(false))
             .style(
               "cursor:pointer;text-decoration: none; font-family: sans;" +
               "color: #000080;font-weight: normal;font-size:14px;"
-            ).text("X"))
+            ).text(" X "))
           .add(Q("span")
-            .text(" ]"))));
+            .text("]"))));
 
     tb.add(Q("tr")
       .add(Q("td")
