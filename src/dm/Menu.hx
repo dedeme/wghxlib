@@ -58,7 +58,7 @@ class Menu {
         .add(Q("tr")
           .add(Q("td")
             .style(
-              "padding-right:4px;" +
+              "text-align:left;padding-right:4px;" +
               "${withSeparator ? 'border-right: 1px solid #000000;' : ''}"
             )
             .adds(It.from(lopts).map(e -> e.wg).to()))
