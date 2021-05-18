@@ -8,6 +8,8 @@ import dm.Ui.Q;
 
 /// Clock widget.
 class Clock {
+  /// 'true' if Clock is a chronometer.
+  public final isChron: Bool;
   /// Default 120
   public var width: Int = 120;
   /// Default 120
@@ -28,7 +30,12 @@ class Clock {
   public var wg(get, never): Domo;
   function get_wg () return mk();
 
-  public function new () {}
+  final start: Null<Date>;
+
+  public function new (isChron = false) {
+    this.isChron = isChron;
+    start = isChron ? Date.now() : null;
+  }
 
   /// Returns clock widget.
   function mk (): Domo {
@@ -107,7 +114,10 @@ class Clock {
   function drawTime (
     ctx: js.html.CanvasRenderingContext2D, radius: Float
   ): Void {
-    final now = Date.now();
+    var now = Date.now();
+    if (isChron) {
+      now = Date.fromTime(now.getTime() - start.getTime() - 3600000);
+    }
     var hours = now.getHours();
     var minute: Float = now.getMinutes();
     var second: Float = now.getSeconds();
