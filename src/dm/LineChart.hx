@@ -427,8 +427,6 @@ class LineChart {
         ;
         ctx2.fillText(tx1, margin1, yfirst);
         ctx2.fillText(tx2, margin2, ysecond);
-
-        trace(data.setLines[setlineIx].value);
       } else {
         cv2.setStyle("visibility", "hidden");
       }
