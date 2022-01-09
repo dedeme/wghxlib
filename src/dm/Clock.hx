@@ -59,7 +59,6 @@ class Clock {
 
   function paint (ctx: js.html.CanvasRenderingContext2D, radius: Float): Void {
     this.drawBorder(ctx, radius);
-    this.drawAxis(ctx, radius);
     this.drawNumbers(ctx, radius);
     this.drawTime(ctx, radius);
     this.drawAxis(ctx, radius);
