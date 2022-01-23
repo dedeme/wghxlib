@@ -3,6 +3,8 @@
 
 package dm;
 
+import dm.Opt;
+
 /// Line chart.
 /// LineChart atributes:
 ///   - exArea
@@ -60,13 +62,12 @@ package dm;
 ///         - dotted: Bool
 ///         - width: Int
 ///       · value: Float
-///     - sets: Array<Array<Float>>
-///     - setAtts: Array<LineChartSetLine>
+///     - sets: Array<Array<Option<Float>>>
+///     - setAtts: Array<LineChartLine>
 ///       · line
 ///         - color:  String
 ///         - dotted: Bool
 ///         - width: Int
-///       · value: Float
 ///     - round: Int
 ///     - maxMinRound: Int
 ///     - drawGrid: (String, Int) -> Bool
@@ -118,29 +119,47 @@ class LineChart {
 
     final hotLabels: Array<Float> = [];
     final hotSetlines: Array<Float> = [];
-    final hotSets: Array<Array<Float>> = [];
+    final hotSets: Array<Array<Option<Float>>> = [];
 
-    var max: Float;
-    var min: Float;
-    var gap: Float;
+    var max: Option<Float> = None;
+    var min = 0.0;
+    var gap = 0.0;
 
     // Set max, min and gap
 
-    max = data.sets[0][0];
-    min = max;
-    for (s in data.sets) for (v in s) {
-      if (v > max) max = v;
-      if (v < min) min = v;
+    for (s in data.sets) for (val in s) {
+      switch (val) {
+        case Some(v):
+          switch(max){
+            case Some(m):
+              max = Some(v > m ? v : m);
+              min = v < min ? v : min;
+            case None:
+              max = Some(v);
+              min = v;
+          }
+        case None:
+      }
     }
     for (s in data.setLines) {
-      if (s.value > max) max = s.value;
-      if (s.value < min) min = s.value;
+      switch(max){
+        case Some(m):
+          max = Some(s.value > m ? s.value : m);
+          min = s.value < min ? s.value : min;
+        case None:
+          max = Some(s.value);
+          min = s.value;
+      }
     }
     final round = Math.pow(10, data.maxMinRound);
-    max = (Math.round(max / round) + 1) * round;
-    min = (Math.round(min / round) - 1) * round;
-
-    gap = max - min;
+    switch (max) {
+      case Some(m):
+        final maxVal = (Math.round(m / round) + 1) * round;
+        max = Some(maxVal);
+        min = (Math.round(min / round) - 1) * round;
+        gap = maxVal - min;
+      case None:
+    }
 
     // Set chart dimensions
 
@@ -304,24 +323,62 @@ class LineChart {
 
     // Draw data sets
 
-    for (i in 0...data.sets.length) {
-      final s = data.sets[i];
-      final cy0 = corr(y0 - (s[0] - min) * h / gap);
-      final hotSetRow: Array<Float> = [cy0];
+    switch (max) {
+      case Some(mx):
+        for (i in 0...data.sets.length) {
+          final s = data.sets[i];
+          final hotSetRow: Array<Option<Float>> = [];
 
-      ctx.setLineDash(data.setAtts[i].dotted ? [4, 2] : []);
-      ctx.lineWidth = data.setAtts[i].width;
-      ctx.strokeStyle = data.setAtts[i].color;
-      ctx.beginPath();
-      ctx.moveTo(corr(x0), cy0);
-      for (j in 1...s.length) {
-        final cy = corr(y0 - (s[j] - min) * h / gap);
-        hotSetRow.push(cy);
-        ctx.lineTo(corr(x0 + j * w / (s.length - 1)), cy);
-      }
-      ctx.stroke();
+          var cy0 = 0.0;
+          var ixStart = 0;
+          for (j in 0...s.length) {
+            final sval = Opt.get(s[j]);
+            if (sval == null) {
+              hotSetRow.push(None);
+              continue;
+            }
+            ixStart = j + 1;
+            cy0 = corr(y0 - (sval - min) * h / gap);
+            hotSetRow.push(Some(cy0));
+            break;
+          }
 
-      hotSets.push(hotSetRow);
+          ctx.setLineDash(data.setAtts[i].dotted ? [4, 2] : []);
+          ctx.lineWidth = data.setAtts[i].width;
+          ctx.strokeStyle = data.setAtts[i].color;
+          ctx.beginPath();
+          ctx.moveTo(corr(x0 + (ixStart - 1) * w / (s.length - 1)), cy0);
+          var j = ixStart;
+          while (j < s.length) {
+            switch (s[j]) {
+              case Some(v):
+                final cy = corr(y0 - (v - min) * h / gap);
+                hotSetRow.push(Some(cy));
+                ctx.lineTo(corr(x0 + j * w / (s.length - 1)), cy);
+                ++j;
+              case None:
+                hotSetRow.push(None);
+                ++j;
+                while (j < s.length) {
+                  switch (s[j]) {
+                    case Some(v):
+                      final cy = corr(y0 - (v - min) * h / gap);
+                      hotSetRow.push(Some(cy));
+                      ctx.moveTo(corr(x0 + j * w / (s.length - 1)), cy);
+                      ++j;
+                      break;
+                    case None:
+                      hotSetRow.push(None);
+                      ++j;
+                  }
+                }
+            }
+          }
+          ctx.stroke();
+
+          hotSets.push(hotSetRow);
+        }
+      case None:
     }
 
     // Draw internal frame
@@ -361,8 +418,11 @@ class LineChart {
       for (i in 0...data.sets.length) {
         final vs = data.sets[i];
         for (j in 0...vs.length) {
+          final hotSet = Opt.get(hotSets[i][j]);
+          if (hotSet == null) continue;
+
           final xdif = hotLabels[j] - cx;
-          final ydif = hotSets[i][j] - cy;
+          final ydif = hotSet - cy;
           final dif = Math.sqrt(xdif * xdif + ydif * ydif);
 
           if (dif < 4 && (setIx == -1 || dif <= setDif)) {
@@ -384,7 +444,7 @@ class LineChart {
 
         if (setIx != -1) {
           tx1 = data.labels[setValIx];
-          tx2 = decFmt(data.sets[setIx][setValIx]);
+          tx2 = decFmt(Opt.get(data.sets[setIx][setValIx]));
           color = data.setAtts[setIx].color;
         } else {
           tx1 = "Line";
@@ -670,7 +730,7 @@ class LineChartData {
   /// X axis labels.
   public final labels: Array<String>;
   /// Y data series.
-  public final sets: Array<Array<Float>>;
+  public final sets: Array<Array<Option<Float>>>;
   /// Y data series attibutes.
   public final setAtts: Array<LineChartLine>;
   /// Fixed data set values (empty by default).
@@ -709,7 +769,7 @@ class LineChartData {
 
   public function new (
     labels: Array<String>,
-    sets: Array<Array<Float>>,
+    sets: Array<Array<Option<Float>>>,
     setAtts: Array<LineChartLine>
   ) {
     if (labels.length == 0)
@@ -742,8 +802,8 @@ class LineChartData {
   public static function mk () {
     final labels = ["Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun"];
     final sets = [
-      [1.0, 2.0, 9.54, 10.2, 6.2, -7, 7],
-      [2, -4, -2.15, -5.2, 7, 3, 4]
+      [1.0, 2.0, 9.54, 10.2, 6.2, -7, 7].map(e -> Some(e)),
+      [2, -4, -2.15, -5.2, 7, 3, 4].map(e -> Some(e))
     ];
     final setAtts = [LineChartLine.mk(),LineChartLine.mk()];
     setAtts[0].color = "#000080";
