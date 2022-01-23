@@ -365,7 +365,7 @@ class LineChart {
           final ydif = hotSets[i][j] - cy;
           final dif = Math.sqrt(xdif * xdif + ydif * ydif);
 
-          if (dif < 4 && (setIx == -1 || dif < setDif)) {
+          if (dif < 4 && (setIx == -1 || dif <= setDif)) {
             setIx = i;
             setValIx = j;
             setDif = dif;
@@ -471,7 +471,7 @@ class LineChart {
 
   public static function mk (): LineChart {
     final atts = LineChartAreaAtts.mk();
-    atts.background = "#d9dadc";
+    atts.background = "#e9eaec";
     return new LineChart(
       LineChartArea.mk(),
       LineChartPadding.mk(),
