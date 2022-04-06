@@ -325,14 +325,18 @@ class LogRow {
   public var date(get, never): Date;
   function get_date() {
     final ix = time.indexOf("(");
-    return Opt.eget(Dt.fromIso(time.substring(0, ix).trim()));
+    return time.charAt(2) == "-"
+      ? Opt.eget(Dt.fromEn(time.substring(0, ix).trim()))
+      : Opt.eget(Dt.fromIso(time.substring(0, ix).trim()))
+    ;
   }
   var time: String;
   var msg: String;
 
   /// Constuctor
   ///   isError: If 'msg' is an error message.
-  ///   time   : Time of message.
+  ///   time   : Time of message in format 'DD/MM/YYYY(HH:MM:SS)' or
+  ///            "MM-DD-YYYY(HH:MM:SS)'.
   ///   msg    : Message
   public function new (isError: Bool, time: String, msg: String) {
     this.isError = isError;
