@@ -44,7 +44,14 @@ class Menu {
   ) {
     final setId = o -> {
       switch (o.id) {
-        case Some(v): o.wg.klass(v == selected ? "frame": "link");
+        case Some(v): o.wg.style(v == selected
+          ?
+            "background-color: rgb(250, 250, 250);" +
+            "border: 1px solid rgb(110,130,150);" +
+            "padding: 4px;border-radius: 4px;"
+          : "text-decoration: none;color: #000080;" +
+            "font-weight: normal;cursor:pointer;"
+          );
         case None:
       }
     }
@@ -54,7 +61,7 @@ class Menu {
     // View --------------------------------------------------------------------
     wg
       .add(Q("table")
-        .klass("main")
+        .style("border-collapse:collapse;width:100%;")
         .add(Q("tr")
           .add(Q("td")
             .style(
